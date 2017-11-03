@@ -54,15 +54,13 @@ class TLDetector(object):
 
         self.imH = self.config['camera_info']['image_height'] # Image height
         self.imW = self.config['camera_info']['image_width'] # Image Width
-        self.flY = self.config['camera_info']['focal_length_y'] # focal length Y
-        self.flX = self.config['camera_info']['focal_length_x'] # focal Length X
 
         self.upcoming_red_light_pub = rospy.Publisher('/traffic_waypoint', Int32, queue_size=1)
         directory = './images/'
 
 
 
-        print('Total of ', len(self.slp), ' stop lines')
+        #print('Total of ', len(self.slp), ' stop lines')
 
         # Create the folder to store saved images
         if not os.path.exists(directory):
