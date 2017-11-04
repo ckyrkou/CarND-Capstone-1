@@ -75,7 +75,7 @@ class TLDetector(object):
         self.last_wp = -1
         self.state_count = 0
 
-        self.light_classifier = TLClassifier()
+        #self.light_classifier = TLClassifier()
         self.initDet = True
         self.listener = tf.TransformListener()
 
@@ -297,16 +297,17 @@ class TLDetector(object):
         #print(light_wp)
 
         if light:
-            state = self.get_light_state(light)
+            #state = self.get_light_state(light)
             #print("Ground Truth: ",self.lights[dist_i].state, " - Classification: ", state)
 
             #frame = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
             #filename = './images_res/' + str(datetime.now().strftime("%Y_%m_%d_%H_%M_%S")) + '___' + str(self.lights[dist_i].state) + '-' + str(state) + '___.jpg'
             #cv2.imwrite(filename,frame)
 
-            #state = self.lights[dist_i].state
+            state = self.lights[dist_i].state
 
             if(state == TrafficLight.RED):
+                rospy.logwarn('Traffic Light Info: %d  - %d', light_wp, state)
                 return light_wp, state
             #    print('go')
             #else:
@@ -314,7 +315,11 @@ class TLDetector(object):
 
         #self.waypoints = None # This was commented out on purpose
 
-        return -1, TrafficLight.UNKNOWN
+        light_wp = -1
+        state = TrafficLight.UNKNOWN
+        rospy.logwarn('Traffic Light Info: %d  - %d', light_wp, state)
+
+        return light_wp, state
 
 if __name__ == '__main__':
     try:
