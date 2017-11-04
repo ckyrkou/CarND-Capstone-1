@@ -69,7 +69,7 @@ class TLDetector(object):
         self.bridge = CvBridge()
         self.initDet = False
 
-        rospy.logwarn('--- Waiting for detector to initialize ---')
+
         self.state = TrafficLight.UNKNOWN
         self.last_state = TrafficLight.UNKNOWN
         self.last_wp = -1
