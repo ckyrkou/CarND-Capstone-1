@@ -29,7 +29,7 @@ class TLClassifier(object):
 
     def __init__(self, model_graph_path=faster_rcnn_real_model):
         #TODO load classifier
-
+        rospy.logwarn('--- Waiting for detector to initialize ---')
         self.detection_graph = tf.Graph()
         with self.detection_graph.as_default():
             od_graph_def = tf.GraphDef()
