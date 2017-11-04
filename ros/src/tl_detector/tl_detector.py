@@ -68,9 +68,8 @@ class TLDetector(object):
 
         self.bridge = CvBridge()
         self.initDet = False
-        print
-        print('---\tWaiting for detector to initialize\t---')
-        print
+
+        rospy.logwarn('--- Waiting for detector to initialize ---')
         self.state = TrafficLight.UNKNOWN
         self.last_state = TrafficLight.UNKNOWN
         self.last_wp = -1
@@ -154,6 +153,7 @@ class TLDetector(object):
         #TODO implement
         #print(pose.position.x,pose.position.y)
 
+
         dist = float('Inf')
         dist_i = 0
         for i in range(0, len(self.waypoints.waypoints)):
@@ -217,7 +217,8 @@ class TLDetector(object):
 
         cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
 
-        x, y = self.project_to_image_plane(light.pose.pose.position)
+        # Throws an error so commented as we do not use the image  change panel
+        #x, y = self.project_to_image_plane(light.pose.pose.position)
 
         #TODO use light location to zoom in on traffic light in image
 
@@ -234,7 +235,7 @@ class TLDetector(object):
 
         """
 
-        if(len(self.lights) == 0 or self.initDet == False):
+        if(len(self.lights) == 0 or self.initDet == False or self.waypoints is None):
             return -1, TrafficLight.UNKNOWN
 
         light = None
