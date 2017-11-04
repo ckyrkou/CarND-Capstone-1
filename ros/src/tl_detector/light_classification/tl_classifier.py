@@ -3,6 +3,8 @@ from styx_msgs.msg import TrafficLight
 from datetime import datetime
 import os
 import math
+import rospy
+import time
 
 import numpy as np
 import tensorflow as tf
@@ -27,6 +29,7 @@ class TLClassifier(object):
 
     def __init__(self, model_graph_path=faster_rcnn_real_model):
         #TODO load classifier
+
         self.detection_graph = tf.Graph()
         with self.detection_graph.as_default():
             od_graph_def = tf.GraphDef()
@@ -48,9 +51,8 @@ class TLClassifier(object):
 
         # start tf session with the detection graph
         self.sess = tf.Session(graph=self.detection_graph)
-        print
-        print('---\tInitialized Traffic Light Classifier\t---')
-        print
+        rospy.logwarn('--- Initialized Traffic Light Classifier ---')
+
 
     def get_classification(self, image):
         """Determines the color of the traffic light in the image
@@ -62,6 +64,8 @@ class TLClassifier(object):
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
 
         """
+        rospy.logwarn("Classifying Image...")
+        time0 = time.time()
         image_np = image
         # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
         image_np_expanded = np.expand_dims(image_np, axis=0)
@@ -74,6 +78,8 @@ class TLClassifier(object):
         scores = np.squeeze(scores)
 
         classes = np.squeeze(classes).astype(np.int32)
+        time1 = time.time()
+        rospy.logwarn("Time in milliseconds: %f", (time1 - time0) * 1000)
 
         return category_index[classes[np.argmax(scores)]]['id']
         #return TrafficLight.UNKNOWN
