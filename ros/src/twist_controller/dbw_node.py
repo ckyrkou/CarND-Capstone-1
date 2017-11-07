@@ -64,7 +64,7 @@ class DBWNode(object):
                                      throttle_gains=throttle_gains, steering_gains=steering_gains)
 
         # Subscriptions
-        rospy.Subscriber('/dbw_enabled', Bool, self.dbw_enabled_cb)
+        rospy.Subscriber('/vehicle/dbw_enabled', Bool, self.dbw_enabled_cb)
         rospy.Subscriber('/current_velocity', TwistStamped, self.current_velocity_cb, queue_size=1)
         rospy.Subscriber('/twist_cmd', TwistStamped, self.twist_cmd_cb, queue_size=1)
 
@@ -77,6 +77,7 @@ class DBWNode(object):
 
     def loop(self):
         rate = rospy.Rate(10) # 50Hz
+
         while not rospy.is_shutdown():
 
             if self.twist_cmd is None or self.current_velocity is None:
@@ -92,30 +93,25 @@ class DBWNode(object):
             rate.sleep()
 
     def publish(self, throttle, brake, steer):
-        rospy.loginfo("publishing throttle %f, brake %f, steer %f", throttle, brake, steer)
-        # We'll either publish the throttle or brake, not both
+        t_cmd = ThrottleCmd()
+        t_cmd.enable = True
+        t_cmd.pedal_cmd_type = ThrottleCmd.CMD_PERCENT
+        t_cmd.pedal_cmd = throttle
+        self.throttle_pub.publish(t_cmd)
 
-        if throttle != 0:
-            tcmd = ThrottleCmd()
-            tcmd.enable = True
-            tcmd.pedal_cmd_type = ThrottleCmd.CMD_PERCENT
-            tcmd.pedal_cmd = throttle
-            self.throttle_pub.publish(tcmd)
-        else:
-            bcmd = BrakeCmd()
-            bcmd.enable = True
-            bcmd.pedal_cmd_type = BrakeCmd.CMD_TORQUE
-            bcmd.pedal_cmd = brake
-            self.brake_pub.publish(bcmd)
+        b_cmd = BrakeCmd()
+        b_cmd.enable = True
+        b_cmd.pedal_cmd_type = BrakeCmd.CMD_TORQUE
+        b_cmd.pedal_cmd = brake
+        self.brake_pub.publish(b_cmd)
 
-        scmd = SteeringCmd()
-        scmd.enable = True
-        scmd.steering_wheel_angle_cmd = steer
-        self.steer_pub.publish(scmd)
-
+        s_cmd = SteeringCmd()
+        s_cmd.enable = True
+        s_cmd.steering_wheel_angle_cmd = steer
+        self.steer_pub.publish(s_cmd)
 
     def dbw_enabled_cb(self, msg):
-        rospy.loginfo("DBW status changed to: %s", msg)
+        rospy.logwarn("DBW status changed to: %s", msg)
         self.dbw_enabled = msg
 
     def current_velocity_cb(self, msg):
